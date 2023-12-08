@@ -181,9 +181,16 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 min_distance_food = min([self.get_maze_distance(my_pos, food) for food in food_list])
                 features['distance_to_food'] = min_distance_food
 
+        # we are leading, use the features of the defensive agents
+        if self.get_score(game_state) > 0:
+            features = DefensiveReflexAgent.get_features(self, game_state, action)
+            
         return features
 
     def get_weights(self, game_state, action):
+        # if we are leading, use the weight of the defensive agents
+        if self.get_score(game_state) > 0:
+            return DefensiveReflexAgent.get_weights(self, game_state, action)
         if self.mode == 'offense':
             return {'successor_score': 100, 'distance_to_food': -1, 'distance_to_home': -2}
         elif self.mode == 'defense':
